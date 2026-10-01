@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>一号公路 10 月行程</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@500;700;800&family=Overpass+Mono:wght@500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ground:#EDF1EF; --surface:#FFFFFF; --ink:#18272B; --muted:#5B6B6E; --line:#D3DCD9;
+  --sign:#0B6B4F; --sign-ink:#FFFFFF; --sign-soft:#DCEDE6;
+  --amber:#A86A00; --amber-soft:#FBEFD5; --ocean:#7FB2C4; --land:#D9E3D3;
+  --danger:#A23A2A; --waze:#33CCFF; --waze-ink:#06222C;
+  --display:"Overpass","Noto Sans SC",system-ui,sans-serif;
+  --body:"Noto Sans SC","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  --mono:"Overpass Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#101A1C; --surface:#172427; --ink:#E4ECEA; --muted:#93A5A7; --line:#2A3B3E;
+    --sign:#2FA77D; --sign-ink:#08140F; --sign-soft:#173A2F;
+    --amber:#E5A93B; --amber-soft:#3A2D12; --ocean:#1F4A5A; --land:#22352C; --danger:#E07A66;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#101A1C; --surface:#172427; --ink:#E4ECEA; --muted:#93A5A7; --line:#2A3B3E;
+  --sign:#2FA77D; --sign-ink:#08140F; --sign-soft:#173A2F;
+  --amber:#E5A93B; --amber-soft:#3A2D12; --ocean:#1F4A5A; --land:#22352C; --danger:#E07A66;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+a{color:var(--sign)}
+:focus-visible{outline:2px solid var(--sign);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+
+/* header */
+.top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.shield{flex:none;width:56px;height:60px}
+.top h1{font-size:28px;font-weight:800;letter-spacing:-.01em}
+.top p{margin:2px 0 0;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.facts div{background:var(--surface);padding:10px 14px}
+.facts b{display:block;font-family:var(--display);font-size:17px;font-variant-numeric:tabular-nums}
+.facts span{font-size:12px;color:var(--muted);letter-spacing:.04em}
+
+/* map */
+.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:18px;align-items:start}
+.mapbox svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.legend h2{font-size:17px}
+.lg{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.dot{width:14px;height:14px;border-radius:50%;margin-top:4px;border:2px solid var(--surface);box-shadow:0 0 0 1.5px currentColor}
+.lg small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45}
+@media (max-width:560px){.mapbox{grid-template-columns:1fr}.mapbox svg{max-width:280px;margin:0 auto}}
+
+/* days */
+.day{display:flex;flex-direction:column;gap:12px}
+.dayhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.dayhead .date{font-family:var(--display);font-weight:800;font-size:24px;font-variant-numeric:tabular-nums}
+.dayhead .wd{font-family:var(--display);font-weight:700;color:var(--muted)}
+.dayhead h2{font-size:17px;font-weight:700;margin-left:auto;font-family:var(--body)}
+.stop{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.stop.key{border-color:var(--sign);box-shadow:inset 4px 0 0 var(--sign)}
+.stop.tbd{border-style:dashed;background:transparent}
+.row1{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.time{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--sign);min-width:52px;font-variant-numeric:tabular-nums}
+.stop h3{font-size:16.5px;font-weight:700;font-family:var(--body)}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:14px;margin:2px 0 0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.mono{font-family:var(--mono);font-weight:600;letter-spacing:.02em}
+.copy{font:inherit;font-size:12px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:0 7px;margin-left:6px;cursor:pointer;vertical-align:1px}
+.copy:hover{color:var(--ink);border-color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:700;font-size:14px;text-decoration:none;padding:7px 12px;border-radius:8px;background:var(--sign);color:var(--sign-ink)}
+.btn.waze{background:var(--waze);color:var(--waze-ink)}
+.btn.ghost{background:transparent;color:var(--sign);box-shadow:inset 0 0 0 1.5px var(--sign)}
+.drive{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;padding-left:18px;position:relative}
+.drive::before{content:"";position:absolute;left:6px;top:-6px;bottom:-6px;border-left:2px dashed var(--line)}
+.drive b{font-family:var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.note{background:var(--amber-soft);color:var(--ink);border-radius:8px;padding:9px 12px;font-size:13.5px;line-height:1.55}
+.note strong{color:var(--amber)}
+ul.tight{margin:0;padding-left:1.2em;font-size:14px}
+ul.tight li+li{margin-top:3px}
+.chip{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;padding:1px 7px;border-radius:999px;background:var(--sign-soft);color:var(--sign);font-family:var(--display);text-transform:uppercase}
+.chip.warn{background:var(--amber-soft);color:var(--amber)}
+
+/* checklist */
+.check{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.check h2{font-size:17px;margin-bottom:8px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line);font-size:14px;cursor:pointer}
+.check label:first-of-type{border-top:0}
+.check input{margin-top:4px;accent-color:var(--sign);width:16px;height:16px;flex:none}
+.check input:checked+span{color:var(--muted);text-decoration:line-through}
+footer{color:var(--muted);font-size:12.5px;line-height:1.6}
+@media (prefers-reduced-motion:no-preference){.btn{transition:filter .15s}.btn:hover{filter:brightness(1.08)}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="top">
+  <svg class="shield" viewBox="0 0 56 60" aria-hidden="true">
+    <path d="M6 4h44l4 10c0 22-10 36-26 44C12 50 2 36 2 14z" fill="var(--sign)"/>
+    <path d="M9 8h38l3 7c0 19-8 31-22 38C14 46 6 34 6 15z" fill="none" stroke="var(--sign-ink)" stroke-width="1.6"/>
+    <text x="28" y="22" text-anchor="middle" font-family="Overpass,sans-serif" font-weight="800" font-size="8.5" fill="var(--sign-ink)" letter-spacing=".5">CALIFORNIA</text>
+    <text x="28" y="45" text-anchor="middle" font-family="Overpass,sans-serif" font-weight="800" font-size="22" fill="var(--sign-ink)">1</text>
+  </svg>
+  <div>
+    <h1>一号公路 · 10 月 1 – 4 日</h1>
+    <p>旧金山机场取车 → 山景城 → 采购 → Apple Stanford → Half Moon Bay → 海岸南下 → Carmel Valley 露营 → 大苏尔 → 10/3 晚回湾区</p>
+  </div>
+</header>
+
+<section class="facts" aria-label="行程概要">
+  <div><span>取车</span><b>10/1 21:00 · SFO</b></div>
+  <div><span>还车</span><b>10/4 21:00 · SFO</b></div>
+  <div><span>车型</span><b>丰田 4Runner</b></div>
+  <div><span>已订住宿</span><b>2 晚 · 10/3 湾区待定</b></div>
+</section>
+
+<section class="mapbox" aria-label="路线示意">
+  <svg viewBox="0 0 260 420" role="img" aria-label="北加州海岸路线示意图">
+    <rect width="260" height="420" fill="var(--ocean)" rx="8"/>
+    <path d="M118 0 L260 0 L260 420 L206 420 C200 392 186 372 176 352 C166 332 150 316 140 300 C128 282 118 262 112 244 C106 228 96 218 92 206 C98 196 104 188 110 184 C118 176 122 166 116 156 C110 146 98 142 88 132 C80 122 76 104 74 88 C72 70 80 50 96 36 C106 26 112 14 118 0 Z" fill="var(--land)"/>
+    <!-- bay -->
+    <path d="M150 20 C160 40 172 58 178 78 C170 70 160 56 150 44 Z" fill="var(--ocean)"/>
+    <!-- route -->
+    <path d="M150 34 L176 74 L164 90 L130 118 L96 98 L90 128 L112 152 L132 158 L108 196 L128 204 M108 196 L118 244 L146 302 L178 352" fill="none" stroke="var(--sign)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0"/>
+    <path d="M178 352 C210 300 214 200 176 74 L150 34" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"/>
+    <g font-family="Overpass,'Noto Sans SC',sans-serif" font-size="11" fill="var(--ink)">
+      <circle cx="150" cy="34" r="6" fill="var(--ink)"/><text x="160" y="31" font-weight="700">SFO</text>
+      <circle cx="176" cy="74" r="6" fill="var(--sign)"/><text x="186" y="78">山景城</text>
+      <circle cx="94" cy="104" r="5" fill="var(--amber)"/><text x="10" y="100">Half Moon</text><text x="10" y="113">Bay</text>
+      <circle cx="164" cy="90" r="4" fill="var(--ink)"/><text x="172" y="98" font-size="10">采购</text>
+      <circle cx="132" cy="158" r="5" fill="var(--amber)"/><text x="140" y="156">Santa Cruz /</text><text x="140" y="168">Capitola</text>
+      <circle cx="128" cy="204" r="6" fill="var(--sign)"/><text x="138" y="208">营地</text>
+      <text x="44" y="200">Carmel</text>
+      <circle cx="122" cy="252" r="5" fill="var(--amber)"/><text x="58" y="262">大苏尔</text>
+      <circle cx="176" cy="350" r="5" fill="var(--amber)"/><text x="124" y="378">San Simeon /</text><text x="124" y="391">Cambria</text>
+      <text x="206" y="236" fill="var(--muted)" font-size="10">10/3 走 101</text><text x="206" y="249" fill="var(--muted)" font-size="10">回湾区</text>
+    </g>
+  </svg>
+  <div class="legend">
+    <h2>你在地图上标的点</h2>
+    <div class="lg"><span class="dot" style="color:var(--sign);background:var(--sign)"></span><div>已订住宿<small>山景城沙市酒店（10/1），Saddle Mountain 营地（10/2，对应地图上卡梅尔的行李箱标记）</small></div></div>
+    <div class="lg"><span class="dot" style="color:var(--amber);background:var(--amber)"></span><div>沿途想去的点<small>第一站 Half Moon Bay；其余按截图位置推断：Santa Cruz 东侧（Capitola）、大苏尔中段、San Simeon / Cambria 以北。导航前请对照你收藏的地点。</small></div></div>
+    <div class="lg"><span class="dot" style="color:var(--muted);background:transparent"></span><div>虚线是 10/3 傍晚走 101 回湾区<small>示意图只表示先后和大致方位，不按比例。</small></div></div>
+  </div>
+</section>
+
+<!-- DAY 1 -->
+<section class="day" aria-labelledby="d1">
+  <div class="dayhead"><span class="date">10/1</span><span class="wd">周四</span><h2 id="d1">取车 · 入住山景城</h2></div>
+
+  <article class="stop key">
+    <div class="row1"><span class="time">21:00</span><h3>SIXT 取车 · SFO 租车中心</h3></div>
+    <p class="sub">出航站楼后跟指示牌坐 <b>AirTrain</b> 到 Rental Car Center，到 <b>1 层</b>找 SIXT 柜台。</p>
+    <dl class="kv">
+      <dt>地址</dt><dd>780 N McDonnell Rd, San Francisco, CA 94128</dd>
+      <dt>车型</dt><dd>丰田 4Runner 或同级 · 车型组代码 <span class="mono">SFAR</span> · 自动挡 5 座</dd>
+      <dt>门店电话</dt><dd><span class="mono">+1 888-749-8227</span> · <a href="tel:+18887498227">拨打</a></dd>
+      <dt>营业时间</dt><dd>00:00–01:00、06:00–23:59</dd>
+    </dl>
+    <div class="note"><strong>柜台提醒：</strong>已在携程买了零起赔的碰撞盗抢险、第三者责任险，还有平安的全险和驾乘意外险（安心补充险），<b>柜台推销的保险都可以拒绝</b>。签合同前核对车型组代码是不是 SFAR。21:00 之后取消要扣全款。</div>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&query=SIXT+SFO+Rental+Car+Center+780+N+McDonnell+Rd" target="_blank" rel="noopener">Google 地图</a>
+      <a class="btn waze" href="https://waze.com/ul?q=780+N+McDonnell+Rd%2C+San+Francisco%2C+CA+94128&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+
+  <div class="drive">约 <b>40 km · 30 分钟</b>　走 US-101 南下</div>
+
+  <article class="stop key">
+    <div class="row1"><span class="time">~22:00</span><h3>山景城帕洛阿尔托沙市酒店</h3><span class="chip">住 1 晚</span></div>
+    <p class="sub">Shashi Hotel Mountain View Palo Alto · 尊荣客房，1 张特大床 · 不含早餐</p>
+    <dl class="kv">
+      <dt>地址</dt><dd>1625 N Shoreline Blvd, Mountain View, CA 94043</dd>
+      <dt>入住 / 退房</dt><dd>15:00 后入住 · 10/2 <b>11:00 前</b>退房</dd>
+      <dt>酒店电话</dt><dd><span class="mono">+1 650-420-2600</span> · <a href="tel:+16504202600">拨打</a></dd>
+    </dl>
+    <div class="note"><strong>23:00 以后才到的话请先给酒店打电话。</strong>前台会收押金或预授权，订单不可取消。早餐要另付，自助早餐 US$30/人（06:30–10:30）。</div>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/dir/?api=1&origin=SFO+Rental+Car+Center&destination=1625+N+Shoreline+Blvd,+Mountain+View,+CA+94043" target="_blank" rel="noopener">Google 地图导航</a>
+      <a class="btn waze" href="https://waze.com/ul?q=1625+N+Shoreline+Blvd%2C+Mountain+View%2C+CA+94043&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+</section>
+
+<!-- DAY 2 -->
+<section class="day" aria-labelledby="d2">
+  <div class="dayhead"><span class="date">10/2</span><span class="wd">周五</span><h2 id="d2">沿海南下 · 入住营地</h2></div>
+
+  <article class="stop key">
+    <div class="row1"><span class="time">09:00</span><h3>退房 → 采购：Walmart + Trader Joe's</h3><span class="chip">离酒店最近</span></div>
+    <p class="sub">两家店在同一个购物中心（San Antonio Center），门挨着门，离酒店约 6 km，开车 10 分钟。一次停车两家都能逛完。</p>
+    <dl class="kv">
+      <dt>Walmart</dt><dd>600 Showers Dr, Mountain View, CA 94040 · 06:00–23:00 · <span class="mono">+1 650-917-0796</span></dd>
+      <dt>Trader Joe's</dt><dd>590 Showers Dr, Mountain View, CA 94040 · 09:00–21:00 · <span class="mono">+1 650-917-1013</span></dd>
+    </dl>
+    <ul class="tight">
+      <li><b>Walmart 买装备和耗材：</b>保温箱、冰块、柴火、打火机、垃圾袋、纸巾、湿巾、桶装水、一次性餐具，帐篷、睡袋、头灯缺的也在这里补。</li>
+      <li><b>Trader Joe's 买吃的：</b>晚饭和 10/3 的早饭、零食、水果、饮料。路上要开一整天，生鲜放进保温箱加冰。</li>
+      <li>Trader Joe's <b>9:00 才开门</b>，可以先逛 Walmart。10:00 再去 Apple Stanford。</li>
+    </ul>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/dir/?api=1&origin=1625+N+Shoreline+Blvd,+Mountain+View,+CA&destination=600+Showers+Dr,+Mountain+View,+CA+94040" target="_blank" rel="noopener">Google 地图导航</a>
+      <a class="btn waze" href="https://waze.com/ul?q=600+Showers+Dr%2C+Mountain+View%2C+CA+94040&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+
+  <div class="drive">沿 El Camino Real 往北，约 <b>4 km · 10 分钟</b></div>
+
+  <article class="stop">
+    <div class="row1"><span class="time">10:00</span><h3>Apple Stanford</h3><span class="chip">顺路</span></div>
+    <p class="sub">斯坦福购物中心里，10:00 开门（周一至周六 10:00–19:00）。停车免费，购物中心里有咖啡和早午餐。保温箱留在车里，进店前确认冰够。</p>
+    <dl class="kv">
+      <dt>地址</dt><dd>379 Stanford Shopping Center, Palo Alto, CA 94304</dd>
+    </dl>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Apple+Stanford+Shopping+Center+Palo+Alto" target="_blank" rel="noopener">Google 地图导航</a>
+      <a class="btn waze" href="https://waze.com/ul?q=Apple+Stanford%2C+379+Stanford+Shopping+Center%2C+Palo+Alto%2C+CA+94304&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+
+  <div class="drive">走 Sand Hill Rd 上 I-280 北行，转 CA-92 往西，约 <b>45 km · 40 分钟</b></div>
+
+  <article class="stop">
+    <div class="row1"><span class="time">~11:30</span><h3>Half Moon Bay</h3><span class="chip warn">第一站</span></div>
+    <p class="sub">CA-92 翻山下来就是 Half Moon Bay 镇和海滩，接上一号公路往南。午饭可以在镇上吃，或者路过 Pescadero 再吃。</p>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Half+Moon+Bay,+CA" target="_blank" rel="noopener">Google 地图导航</a>
+      <a class="btn waze" href="https://waze.com/ul?q=Half+Moon+Bay%2C+CA&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+
+  <div class="drive">一号公路往南，约 <b>80 km · 1 小时 15 分钟</b>，到 Santa Cruz</div>
+
+  <article class="stop">
+    <div class="row1"><span class="time">下午</span><h3>Santa Cruz / Capitola</h3><span class="chip warn">地图标记</span></div>
+    <p class="sub">红心标记在圣克鲁兹东侧，大概是 Capitola 一带的海滩。从这里到营地约 1 小时 15 分钟，<b>最晚 16:30 出发</b>（上午多逛了 Apple，这里可玩的时间会少半小时左右）。</p>
+  </article>
+
+  <article class="stop">
+    <div class="row1"><span class="time">~17:30</span><h3>（可选）蒙特雷补冰</h3></div>
+    <p class="sub">保温箱的冰化得差不多了的话，进 Carmel Valley 前在 Monterey / Carmel 的超市补一袋。</p>
+  </article>
+
+  <div class="drive">Mountain View 经 Half Moon Bay 到营地全程约 <b>215 km · 开车 3.5 小时</b>，不含停留</div>
+
+  <article class="stop key">
+    <div class="row1"><span class="time">18:00 前</span><h3>Saddle Mountain 营地</h3><span class="chip">住 1 晚</span></div>
+    <p class="sub">Carmel Valley · 自驾帐篷位 · 2 人 1 车 · 已付 $103，不用再付钱</p>
+    <dl class="kv">
+      <dt>地址</dt><dd>27625 Schulte Rd, Carmel, CA 93923</dd>
+      <dt>入住 / 退房</dt><dd>帐篷位 13:00–20:00 入住 · 10/3 12:00 前退房（日历邀请写的是 11:00，按 11:00 安排更稳）</dd>
+      <dt>营地电话</dt><dd><span class="mono">+1 831-624-1617</span> · <a href="tel:+18316241617">拨打</a></dd>
+      <dt>邮箱</dt><dd>stay@saddlemountain.com</dd>
+    </dl>
+    <div class="note"><strong>务必天黑前到。</strong>办公室只值班到 18:00，当天日落大约 18:50。营地属于"暗夜社区"，晚上几乎没有照明，<b>原始帐篷位天黑后入场要提前得到办公室同意</b>。预计晚到就先打电话。21:00 开始安静时间。</div>
+    <ul class="tight">
+      <li>进 Schulte Rd 后，路会在两个房车营地入口前分岔：<b>靠左上坡</b>，到坡顶去前台办理入住。</li>
+      <li>抵达后 30 分钟内要办好入住。办公室下班后，入住资料放在前台柜台上自取。</li>
+    </ul>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/dir/?api=1&origin=1625+N+Shoreline+Blvd,+Mountain+View,+CA&destination=27625+Schulte+Rd,+Carmel,+CA+93923&waypoints=600+Showers+Dr,+Mountain+View,+CA%7CStanford+Shopping+Center,+Palo+Alto,+CA%7CHalf+Moon+Bay,+CA%7CCapitola,+CA" target="_blank" rel="noopener">Google 全程路线</a>
+      <a class="btn waze" href="https://waze.com/ul?q=27625+Schulte+Rd%2C+Carmel%2C+CA+93923&navigate=yes" target="_blank" rel="noopener">Waze 去营地</a>
+      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=Saddle+Mountain+RV+Park+Campground+27625+Schulte+Rd+Carmel" target="_blank" rel="noopener">营地位置</a>
+    </div>
+  </article>
+</section>
+
+<!-- DAY 3 -->
+<section class="day" aria-labelledby="d3">
+  <div class="dayhead"><span class="date">10/3</span><span class="wd">周六</span><h2 id="d3">大苏尔 → 晚上回湾区</h2></div>
+
+  <article class="stop">
+    <div class="row1"><span class="time">≤11:00</span><h3>营地退房 → 回到一号公路</h3></div>
+    <p class="sub">沿 Carmel Valley Rd 往西开约 10 分钟回到 Hwy 1，转向南进入大苏尔。出发前在 Carmel 加满油，大苏尔段几乎没有加油站。</p>
+  </article>
+
+  <article class="stop">
+    <div class="row1"><span class="time">12:00</span><h3>大苏尔中段</h3><span class="chip warn">地图标记</span></div>
+    <p class="sub">绿旗在卡梅尔以南约 40–50 km 的海岸上，大概是 Big Sur 村 / Pfeiffer 一带。这一段基本没有手机信号，<b>离线地图提前下载好</b>。</p>
+  </article>
+
+  <article class="stop">
+    <div class="row1"><span class="time">~15:00</span><h3>San Simeon / Cambria 以北</h3><span class="chip warn">地图标记</span></div>
+    <p class="sub">最南边那个绿旗，附近有 Piedras Blancas 象海豹观景点。从大苏尔中段开过来约 100 km，不停车也要 2 小时。</p>
+    <div class="note"><strong>时间比较紧：</strong>从这里回湾区还要约 3.5 小时（经 CA-46 接 US-101 北上）。要在 20:00 前回到湾区，最晚 <b>16:00</b> 从 San Simeon 出发。如果大苏尔停留太久，可以在大苏尔原路折返：沿一号公路回 Carmel，再经 CA-156 接 US-101，回湾区约 2.5 小时。</div>
+    <div class="note"><strong>出发前查路况：</strong>大苏尔段一号公路常因塌方封路，10/3 早上先看 Caltrans QuickMap（quickmap.dot.ca.gov），确认能不能一路通到 San Simeon。</div>
+  </article>
+
+  <div class="drive">San Simeon → 湾区（Mountain View 一带）约 <b>300 km · 3.5 小时</b>，走 CA-46 / US-101</div>
+
+  <article class="stop tbd">
+    <div class="row1"><span class="time">~20:00</span><h3>10/3 回到湾区：住宿没找到预订</h3><span class="chip warn">待定</span></div>
+    <p class="sub">邮箱里没有 10/3 晚上的确认邮件。第二天 21:00 要在 SFO 还车，住半岛或南湾都方便。</p>
+    <div class="actions">
+      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&origin=27625+Schulte+Rd,+Carmel,+CA&destination=Mountain+View,+CA&waypoints=Big+Sur,+CA%7CSan+Simeon,+CA" target="_blank" rel="noopener">Google 全天路线</a>
+      <a class="btn waze" href="https://waze.com/ul?q=Elephant+Seal+Vista+Point%2C+San+Simeon%2C+CA&navigate=yes" target="_blank" rel="noopener">Waze 去象海豹</a>
+    </div>
+  </article>
+</section>
+
+<!-- DAY 4 -->
+<section class="day" aria-labelledby="d4">
+  <div class="dayhead"><span class="date">10/4</span><span class="wd">周日</span><h2 id="d4">湾区自由活动 · 晚上还车</h2></div>
+
+  <article class="stop">
+    <div class="row1"><span class="time">白天</span><h3>湾区自由安排</h3></div>
+    <p class="sub">车一直用到晚上 21:00。地图上圣塔克拉拉 / 圣荷西附近还有几个红心收藏，可以这天去。</p>
+  </article>
+
+  <article class="stop key">
+    <div class="row1"><span class="time">21:00 前</span><h3>SIXT 还车 · SFO 租车中心</h3></div>
+    <p class="sub">导航到 780 N McDonnell Rd，进机场后跟 <b>Rental car return</b> 和 SIXT 指示牌，开上租车车库 <b>2 层左转</b>，停进 SIXT 还车区。没人的话，带齐随身物品、锁车，把钥匙投进柜台旁的钥匙箱。</p>
+    <div class="note"><strong>还车前加满油</strong>（机场附近加油站比较少，提前在 Millbrae / San Bruno 加）。路费、罚单会由 SIXT 事后另外扣款。保温箱、柴火之类用不完的东西记得提前处理掉。</div>
+    <div class="actions">
+      <a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=780+N+McDonnell+Rd,+San+Francisco,+CA+94128" target="_blank" rel="noopener">Google 地图导航</a>
+      <a class="btn waze" href="https://waze.com/ul?q=780+N+McDonnell+Rd%2C+San+Francisco%2C+CA+94128&navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </article>
+</section>
+
+<section class="check" aria-labelledby="ck">
+  <h2 id="ck">出发前清单</h2>
+  <label><input type="checkbox" id="c1"><span>护照、驾照（建议带国际驾照或驾照翻译件）、主驾驶人本人的信用卡</span></label>
+  <label><input type="checkbox" id="c2"><span>Google 地图离线下载：湾区 → 大苏尔 → San Simeon</span></label>
+  <label><input type="checkbox" id="c7"><span>10/2 采购清单：保温箱、冰、柴火、水、晚饭和早饭</span></label>
+  <label><input type="checkbox" id="c3"><span>订好 10/3 晚上湾区的住宿</span></label>
+  <label><input type="checkbox" id="c4"><span>露营装备：帐篷、睡袋、防潮垫、头灯、保暖衣物（Carmel Valley 夜里会很凉）</span></label>
+  <label><input type="checkbox" id="c5"><span>10/3 早上查 Caltrans 大苏尔路况</span></label>
+  <label><input type="checkbox" id="c6"><span>还车前加满油</span></label>
+</section>
+
+<footer>
+  信息整理自酒店、租车和营地的预订确认，公开版已隐去确认号和姓名。车程是大致估算；Waze 不支持途经点，Waze 按钮只导航到该站目的地，全程路线请用 Google 地图；超市营业时间来自网上公开信息，出发前以门店实际为准；地图标记点是按截图位置推断的，以你实际收藏的地点为准。清单勾选只保存在当前这台设备的浏览器里。
+</footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=b.getAttribute('data-copy'),done=function(){b.textContent='已复制';setTimeout(function(){b.textContent='复制'},1500)};
+    try{navigator.clipboard.writeText(t).then(done,function(){b.textContent=t})}catch(e){b.textContent=t}
+  });
+});
+var KEY='hwy1-oct-checklist';
+var saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+document.querySelectorAll('.check input').forEach(function(i){
+  if(saved[i.id])i.checked=true;
+  i.addEventListener('change',function(){saved[i.id]=i.checked;try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}});
+});
+</script>
+
+</body>
+</html>
